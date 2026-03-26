@@ -14,13 +14,16 @@ if [[ -z $SCRIPT_DIR ]] ; then echo "Something didn't work, exiting"; exit; fi
 # check if the grub folder is called grub/ or grub2/
 if [ -d /boot/grub ]    ; then
 	grub_path="/boot/grub"
+    grub_prefix="grub"
 elif [ -d /boot/grub2 ] ; then
 	grub_path="/boot/grub2"
+    grub_prefix="grub2"
 else 
 	echo "Can't find a /boot/grub or /boot/grub2 folder. Exiting."
 	exit 
 fi
 theme_path="$grub_path/themes/minegrub-world-selection"
+mkdir -p "$theme_path"
 
 
 ## Prompts
@@ -38,23 +41,28 @@ fi
 need_run_mkconfig=false
 
 echo
-read -p "[?] Apply patch to be able to set the grub-consoles background with GRUB_BACKGROUND? [y/N] " -e skip_patch_background
-if [[ "$skip_patch_background" =~ y|Y ]]; then
+read -p "[?] Apply patch to be able to set the grub-consoles background with GRUB_BACKGROUND? [y/N] " -e apply_patch_background
+if [[ "$apply_patch_background" =~ y|Y ]]; then
     need_run_mkconfig=true
     echo "[INFO] Editing /etc/grub.d/00_header"
     # Backing up that file, just in case
     cp --no-clobber /etc/grub.d/00_header ./00_header.bak
-    # sed'ing that one line
+    # Patching that one line in 00_header
     sed --in-place -E 's/(.*)elif(.*"x\$GRUB_BACKGROUND" != x ] && [ -f "\$GRUB_BACKGROUND" ].*)/\1fi; if\2/' /etc/grub.d/00_header \
         && bg_patch_applied=true
+    # change grub configuration
+    echo "[INFO] Editing /etc/default/grub"
+    sed -i "/^GRUB_BACKGROUND=/d" /etc/default/grub
+    echo -e  "GRUB_BACKGROUND=$theme_path/minegrub-world-selection/dirt.png" >> /etc/default/grub
 else
-    echo "[INFO] [Skipping] Editing grub drop-in-config file"
+    echo "[INFO] [Skipping] Editing grub drop-in-config file. Removing 'GRUB_BACKGROUND' from /etc/default/grub"
+    sed -i "/^GRUB_BACKGROUND=/d" /etc/default/grub
 fi
 
 
 echo
-read -p "[?] Apply patch to show icon for the UEFI entry [y/N] " -e skip_patch_uefi
-if [[ "$skip_patch_uefi" =~ y|Y ]]; then
+read -p "[?] Apply patch to show icon for the UEFI entry [y/N] " -e apply_patch_uefi
+if [[ "$apply_patch_uefi" =~ y|Y ]]; then
     need_run_mkconfig=true
     echo "[INFO] Editing '/etc/grub.d/30_uefi-firmware'"
     # Backing up that file, just in case
@@ -66,8 +74,8 @@ else
 fi
 
 echo
-read -p "[?] Apply patch to show icons for 'Advanced options' entry [y/N] " -e skip_patch
-if [[ "$skip_patch" =~ y|Y ]]; then
+read -p "[?] Apply patch to show icons for 'Advanced options' entry [y/N] " -e apply_patch
+if [[ "$apply_patch" =~ y|Y ]]; then
     need_run_mkconfig=true
     echo "[INFO] Editing '/etc/grub.d/10_linux'"
     # Backing up that file, just in case
@@ -78,18 +86,27 @@ else
     echo "[INFO] [Skipping] Editing grub drop-in config-file"
 fi
 
-mkconfig_cmd=grub-mkconfig
+mkconfig_cmd="$grub_prefix-mkconfig"
+
 echo
 echo "======= Done! ======="
-echo "Make sure to add/change this line in /etc/default/grub ..."
+echo
+echo "Make sure these lines are added in /etc/default/grub:" 
 if [[ "$bg_patch_applied" == "true" ]] ; then
     echo -e "    GRUB_BACKGROUND=$theme_path/dirt.png"
 fi
-echo -e "    GRUB_THEME=$theme_path/theme.txt"
-echo "...and run '$mkconfig_cmd -o $grub_path/grub.cfg'" 
+    echo -e "    GRUB_THEME=$theme_path/theme.txt"
+echo "and then run:"
+echo "> '$mkconfig_cmd -o $grub_path/grub.cfg'" 
+
+# Optionally run grub-mkconfig
 if [[ "$need_run_mkconfig" == "true" ]]; then
     read -p "[!] Run $mkconfig_cmd now? [Y/n] " -en 1 mkconfig
     if [[ "$mkconfig" =~ y|Y || -z "$mkconfig" ]]; then
+        sed -i "/^GRUB_TIMEOUT_STYLE=/d" /etc/default/grub
+        sed -i "/^GRUB_THEME=/d"         /etc/default/grub
+        echo -e "GRUB_TIMEOUT_STYLE=menu"                                   >> /etc/default/grub
+        echo -e "GRUB_THEME=$theme_path/minegrub-world-selection/theme.txt" >> /etc/default/grub
         $mkconfig_cmd -o "$grub_path/grub.cfg"
     fi
 fi
