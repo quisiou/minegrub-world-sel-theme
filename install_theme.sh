@@ -23,7 +23,6 @@ else
 	exit 
 fi
 theme_path="$grub_path/themes/minegrub-world-selection"
-mkdir -p "$theme_path"
 
 
 ## Prompts
@@ -32,11 +31,11 @@ read -p "[?] Copy/Update the theme to '$theme_path'? [Y/n] " -en 1 copy_theme
 if [[ "$copy_theme" =~ y|Y || -z "$copy_theme" ]]; then
     echo "[INFO] => Copying the theme files to boot partition:"
     # copy recursive, update, verbose
+    mkdir -p "$theme_path"
     cd $SCRIPT_DIR && cp -ruv ./minegrub-world-selection  "$grub_path/themes/" | awk '$0 !~ /skipped/ { print "\t"$0 }'
 else
     echo "[INFO] [Skipping] Copying the theme files to boot partition"
 fi
-
 
 need_run_mkconfig=false
 
@@ -53,9 +52,10 @@ if [[ "$apply_patch_background" =~ y|Y ]]; then
     # change grub configuration
     echo "[INFO] Editing /etc/default/grub"
     sed -i "/^GRUB_BACKGROUND=/d" /etc/default/grub
-    echo -e  "GRUB_BACKGROUND=$theme_path/minegrub-world-selection/dirt.png" >> /etc/default/grub
+    echo -e  "GRUB_BACKGROUND=$theme_path/dirt.png" >> /etc/default/grub
 else
-    echo "[INFO] [Skipping] Editing grub drop-in-config file. Removing 'GRUB_BACKGROUND' from /etc/default/grub"
+    echo "[INFO] [Skipping] Editing grub drop-in-config file."
+    echo "[INFO] Removing 'GRUB_BACKGROUND' from /etc/default/grub"
     sed -i "/^GRUB_BACKGROUND=/d" /etc/default/grub
 fi
 
@@ -86,27 +86,47 @@ else
     echo "[INFO] [Skipping] Editing grub drop-in config-file"
 fi
 
-mkconfig_cmd="$grub_prefix-mkconfig"
+
+if [ ! -d "$theme_path" ]; then 
+    echo "[WARN] The theme wasn't installed. Try to run the script again. Exiting."
+    exit 0
+fi
+
+echo
+sleep 0.5 # Just for fun
+echo "[INFO] Setting theme in /etc/default/grub"
+sed -i "/^GRUB_TIMEOUT_STYLE=/d" /etc/default/grub
+sed -i "/^GRUB_THEME=/d"         /etc/default/grub
+echo -e "GRUB_TIMEOUT_STYLE=menu"          >> /etc/default/grub
+echo -e "GRUB_THEME=$theme_path/theme.txt" >> /etc/default/grub
+sleep 1
 
 echo
 echo "======= Done! ======="
 echo
-echo "Make sure these lines are added in /etc/default/grub:" 
+echo "| Make sure these lines were added to /etc/default/grub:" 
 if [[ "$bg_patch_applied" == "true" ]] ; then
-    echo -e "    GRUB_BACKGROUND=$theme_path/dirt.png"
+echo -e "|   GRUB_BACKGROUND=$theme_path/dirt.png"
 fi
-    echo -e "    GRUB_THEME=$theme_path/theme.txt"
-echo "and then run:"
-echo "> '$mkconfig_cmd -o $grub_path/grub.cfg'" 
+echo -e "|   GRUB_THEME=$theme_path/theme.txt"
+
 
 # Optionally run grub-mkconfig
+mkconfig_cmd="$grub_prefix-mkconfig"
 if [[ "$need_run_mkconfig" == "true" ]]; then
-    read -p "[!] Run $mkconfig_cmd now? [Y/n] " -en 1 mkconfig
+    echo "| You need to run the following command:"
+    echo "| > '$mkconfig_cmd -o $grub_path/grub.cfg'" 
+    echo
+    read -p "[?] Run $mkconfig_cmd now? [Y/n] " -en 1 mkconfig
     if [[ "$mkconfig" =~ y|Y || -z "$mkconfig" ]]; then
-        sed -i "/^GRUB_TIMEOUT_STYLE=/d" /etc/default/grub
-        sed -i "/^GRUB_THEME=/d"         /etc/default/grub
-        echo -e "GRUB_TIMEOUT_STYLE=menu"                                   >> /etc/default/grub
-        echo -e "GRUB_THEME=$theme_path/minegrub-world-selection/theme.txt" >> /etc/default/grub
+        $mkconfig_cmd -o "$grub_path/grub.cfg"
+    fi
+else
+    echo "| and then run:"
+    echo "| > '$mkconfig_cmd -o $grub_path/grub.cfg'" 
+    echo
+    read -p "[?] Run $mkconfig_cmd now? [y/N] " -en 1 mkconfig
+    if [[ "$mkconfig" =~ y|Y ]]; then
         $mkconfig_cmd -o "$grub_path/grub.cfg"
     fi
 fi
