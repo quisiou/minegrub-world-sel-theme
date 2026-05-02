@@ -65,7 +65,6 @@ c=bedrock	&& $cmd $c 'Bedrock Linux (03/08/2012, 1:34 PM)'		'Adventure Mode, Ver
 c=manjaro	&& $cmd $c 'Manjaro Linux (10/07/2011, 00:38 AM)' 		'Adventure Mode, Cheats, Version 23.0.0' $src$c.png $dst
 c=linuxmint	&& $cmd $c 'Linux Mint (08/27/2006, 6:11 AM)' 		'Adventure Mode, No Cheats, Version 21.3' $src$c.png $dst
 c=kali		&& $cmd $c 'Kali Linux (03/13/2013, 4:37 PM)' 'Adventure Mode, Cheats, Version 2023.4' $src$c.png $dst
-c=fedora	&& $cmd $c 'Fedora Linux (06/11/2003, 2:19 PM)'		'Survival Mode, No Cheats, Version: 39' $src$c.png $dst
 c=zorin     && $cmd $c 'Zorin OS (01/07/2009, 8:54 PM)' 'Survival Mode, Cheats, Version: 17.1' $src$c.png $dst
 c=nobara    && $cmd $c 'Nobara Linux (07/10/2022, 9:11 AM)' 'Creative Mode, Cheats, Version: 40' $src$c.png $dst
 c=nixos     && $cmd $c 'Nix OS (03/06/2022, 3:34 AM)' 'Spectator Mode, No Cheats, Version: 24.11' $src$c.png $dst
@@ -79,7 +78,7 @@ c=alt-linux && $cmd $c 'Alt Linux (01/02/2000, 6:21 PM)'    'Survival Mode, Chea
 c=astra     && $cmd $c 'Astra Linux (01/01/2010, 03:19 AM)'     'Survival Mode, Cheats, Version: 1.8.1.6' $src$c.png $dst
 c=debian	&& $cmd $c 'Debian (16/08/1993, 5:33 PM)'		'Survival Mode, Cheats, Version: 12' $src$c.png $dst
 c=deepin    && $cmd $c 'Deepin Linux (16/08/2004, 08:11 AM)'     'Adventure Mode, No Cheats, Version: 25.0.1' $src$c.png $dst
-c=fedora    && $cmd $c 'Fedora Linux (06/11/2003, 02:19 PM)'     'Adventure Mode, No Cheats, Version: 43' $src$c.png $dst
+c=fedora    && $cmd $c 'Fedora Linux (06/11/2003, 02:19 PM)'     'Adventure Mode, No Cheats, Version: 44' $src$c.png $dst
 c=opensuse  && $cmd $c 'OpenSUSE (17/03/1994, 08:03 AM)'     'Creative Mode, Cheats, Version: 16.0' $src$c.png $dst
 
 # no minecraft logo yet
