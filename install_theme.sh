@@ -27,7 +27,7 @@ theme_path="$grub_path/themes/minegrub-world-selection"
 
 ## Prompts
 
-read -p "[?] Copy/Update the theme to '$theme_path'? [Y/n] " -en 1 copy_theme
+read -p "[?] Copy/Update the theme to '$theme_path'? [Y/n] " -e copy_theme
 if [[ "$copy_theme" =~ y|Y || -z "$copy_theme" ]]; then
     echo "[INFO] => Copying the theme files to boot partition:"
     # copy recursive, update, verbose
@@ -117,7 +117,7 @@ if [[ "$need_run_mkconfig" == "true" ]]; then
     echo "| You need to run the following command:"
     echo "| > '$mkconfig_cmd -o $grub_path/grub.cfg'" 
     echo
-    read -p "[?] Run $mkconfig_cmd now? [Y/n] " -en 1 mkconfig
+    read -p "[?] Run $mkconfig_cmd now? [Y/n] " -e mkconfig
     if [[ "$mkconfig" =~ y|Y || -z "$mkconfig" ]]; then
         $mkconfig_cmd -o "$grub_path/grub.cfg"
     fi
@@ -125,7 +125,7 @@ else
     echo "| and then run:"
     echo "| > '$mkconfig_cmd -o $grub_path/grub.cfg'" 
     echo
-    read -p "[?] Run $mkconfig_cmd now? [y/N] " -en 1 mkconfig
+    read -p "[?] Run $mkconfig_cmd now? [y/N] " -e mkconfig
     if [[ "$mkconfig" =~ y|Y ]]; then
         $mkconfig_cmd -o "$grub_path/grub.cfg"
     fi
