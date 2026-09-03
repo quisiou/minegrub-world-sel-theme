@@ -60,12 +60,12 @@
 
               done
 
-              BG_IMG_SRC="../assets/background-scaled/${cfg.backgroundImage}"
+              BG_IMG_SRC="${self}/${cfg.background}"
               if [ -f "$BG_IMG_SRC" ]; then
-                echo "Using background image: ${cfg.backgroundImage}"
+                echo "Using background image: $BG_IMG_SRC"
                 cp -f "$BG_IMG_SRC" "../minegrub-world-selection/background.png"
               else
-                echo "ERROR: backgroundImage '${cfg.backgroundImage}' not found in assets/background-scaled/" >&2
+                echo "ERROR: $BG_IMG_SRC does not exist" >&2
                 exit 1
               fi
 
@@ -104,14 +104,11 @@
                   - customImg: Path to a custom image file stored locally.
                 '';
               };
-              backgroundImage = mkOption {
+              background = mkOption {
                 type = types.str;
-                default = "background-1920x1080.png";
-                example = "background-2560x1600.png";
-                description = ''
-                  Path to a specific scaled background (any file on assets/background-scaled).
-                  If not set, the theme's default scaled background will be used.
-                '';
+                default = "assets/background-scaled/background-1920x1080.png";
+                example = "assets/background-scaled/background-2560x1440.png";
+                description = "Path to background image, relative to the theme source";
               };
             };
           };
