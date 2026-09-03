@@ -60,6 +60,15 @@
 
               done
 
+              BG_IMG_SRC="../assets/background-scaled/${cfg.backgroundImage}"
+              if [ -f "$BG_IMG_SRC" ]; then
+                echo "Using background image: ${cfg.backgroundImage}"
+                cp -f "$BG_IMG_SRC" "../minegrub-world-selection/background.png"
+              else
+                echo "ERROR: backgroundImage '${cfg.backgroundImage}' not found in assets/background-scaled/" >&2
+                exit 1
+              fi
+
               cp -r ../minegrub-world-selection/* $out/grub/theme/
             '';
           };
@@ -93,6 +102,15 @@
                   For icon file choose only one source:
                   - imgName: Name of the icon to load from the minegrub repository. (from icon-generator folder)
                   - customImg: Path to a custom image file stored locally.
+                '';
+              };
+              backgroundImage = mkOption {
+                type = types.str;
+                default = "background-1920x1080.png";
+                example = "background-2560x1600.png";
+                description = ''
+                  Path to a specific scaled background (any file on assets/background-scaled).
+                  If not set, the theme's default scaled background will be used.
                 '';
               };
             };
